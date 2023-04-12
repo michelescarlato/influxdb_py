@@ -106,7 +106,10 @@ def write_db_bulk(my_bucket, my_org, my_token, my_url, data):
             data = data.set_index(['timems'])
             _write_client.write(my_bucket, my_org, record=data, data_frame_measurement_name='h3o_feet',
                                 data_frame_tag_columns=['timems'])
-    print("after bulk write")
+
+    global line_inserted_count
+    line_inserted_count = line_inserted_count + len(data.index)
+    print("after bulk write - points inserted so far:"+str(line_inserted_count))
     return
 
 
@@ -156,8 +159,8 @@ fields_name = get_fields_name("../CSV_machine_data/0/1.csv")
 time_end = load_data(bucket, org, token, url, csv_dir, epoch, secs_interval)
 print('Last data inserted at time: '+str(time_end))
 logging.info('Last data inserted at time: '+str(time_end))
-#print("Total number of line inserted:" + str(line_inserted_count))
-#logging.info("Total number of line inserted:" + str(line_inserted_count))
+print("Total number of line inserted:" + str(line_inserted_count))
+logging.info("Total number of line inserted:" + str(line_inserted_count))
 
 end = time.time()
 
