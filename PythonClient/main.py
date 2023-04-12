@@ -73,16 +73,17 @@ def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch
     return new_epoch
 
 
-def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch, secs_interval):
+def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch, secs_interval, currentTime):
     data = pd.read_csv(csv_file, sep=',')
     # take the first 250 values
     first_column = data.iloc[:,0]
     second_n_column = data.iloc[:, 1:249].astype(float)
     row_index = 0
+    if new_epoch > currentTime:
+        return new_epoch
     for t in first_column:
         # increasing timestamp by x secs
         new_epoch = new_epoch + timedelta(seconds=int(secs_interval))
-        new_epoch = new_epoch + timedelta(seconds=1)
         first_column.iat[row_index] = new_epoch
         row_index = row_index + 1
     result = pd.concat([first_column, second_n_column], axis=1)
@@ -121,9 +122,13 @@ def load_data(bucket, org, token, url, csv_dir, epoch, secs_interval):
             while file < count:
                 csv_filename = csv_dir + str(dir) + '/' + str(file) + ".csv"
                 #epoch = write_csv_data_to_db_few_values(csv_filename, bucket, org, token, url, epoch)
-                epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch, secs_interval)
+                if epoch > currentTime:
+                    return epoch
+                epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch, secs_interval, currentTime)
                 file = file + 1
             dir = dir + 1
+    logging.info('Last data inserted at time _ epoch inside load data: ' + str(epoch))
+    print(epoch)
     return epoch
 
 def get_fields_name(csv_path):
