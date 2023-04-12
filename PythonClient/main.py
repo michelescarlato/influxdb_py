@@ -1,4 +1,6 @@
 # import InfluxDB_ConfigurationInstance
+import logging
+
 import influxdb_client
 from influxdb_client import WritePrecision, InfluxDBClient, Point, WriteOptions
 from influxdb_client.client.write_api import SYNCHRONOUS#, BATCHING
@@ -10,7 +12,6 @@ import subprocess
 import fnmatch
 from datetime import datetime
 from datetime import timedelta
-
 import time
 
 
@@ -61,7 +62,6 @@ def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch
     # line by line data    -->take 1,12 columns --> create time series gg, sec, a random value,
     for t in data.itertuples():
         value = t[11]
-        # exclude NaN
         # increasing timestamp by 90 secs
         new_epoch = new_epoch + timedelta(seconds=10)
         # Fields cannot be added to Pandas tuples - need a conversion to list
@@ -70,8 +70,6 @@ def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch
         l[0] = new_epoch
         # rollback list to tuple
         t = tuple(l)
-        #the if value control prevents from inserting empty values
-        #if value == value:
         data_db = [new_epoch, value]
         write_db(bucket, org, token, url, data_db)
     return new_epoch
@@ -81,17 +79,15 @@ def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch
     data = pd.read_csv(csv_file, sep=',')
     # take the first 250 values
     first_column = data.iloc[:,0]
-    print(first_column)
     second_n_column = data.iloc[:, 1:249].astype(float)
     row_index = 0
     for t in first_column:
-        # add the new timestamp in the empty field:
-        # increasing timestamp by 90 secs
-        new_epoch = new_epoch + timedelta(seconds=90)
-        first_column.iloc[row_index] = new_epoch
+        # increasing timestamp by x secs
+        new_epoch = new_epoch + timedelta(seconds=1)
+        first_column.iat[row_index] = new_epoch
         row_index = row_index + 1
     result = pd.concat([first_column, second_n_column], axis=1)
-    print(result)
+    #print(result)
     write_db_bulk(bucket, org, token, url, result)
     return new_epoch
 
@@ -116,17 +112,20 @@ def write_db_bulk(my_bucket, my_org, my_token, my_url, data):
 
 
 def load_data(bucket, org, token, url, csv_dir, epoch):
-    dir = 0
-    while dir <= 2:
-        file = 0
-        count = len(fnmatch.filter(os.listdir(csv_dir + str(dir)), '*.*'))
-        while file < count:
-            csv_filename = csv_dir + str(dir) + '/' + str(file) + ".csv"
-            #print(csv_filename)
-            #epoch = write_csv_data_to_db_few_values(csv_filename, bucket, org, token, url, epoch)
-            epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch)
-            file = file + 1
-        dir = dir + 1
+    currentTime = datetime.utcnow()
+    while epoch < currentTime:
+        print(epoch)
+        dir = 0
+        while dir <= 2:
+            file = 0
+            count = len(fnmatch.filter(os.listdir(csv_dir + str(dir)), '*.*'))
+            while file < count:
+                csv_filename = csv_dir + str(dir) + '/' + str(file) + ".csv"
+                #print(csv_filename)
+                #epoch = write_csv_data_to_db_few_values(csv_filename, bucket, org, token, url, epoch)
+                epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch)
+                file = file + 1
+            dir = dir + 1
     return epoch
 
 def get_fields_name(csv_path):
@@ -135,6 +134,8 @@ def get_fields_name(csv_path):
     fields_name_250 = fields_name[0:249]
     print(fields_name_250)
     return fields_name_250
+
+logging.basicConfig(filename="logs/"+str(datetime.utcnow())+"_run.log", level=logging.INFO)
 
 # start script temporizer
 start = time.time()
@@ -151,9 +152,13 @@ fields_name = get_fields_name("../CSV_machine_data/0/1.csv")
 # load the CSVs and get the last recorded time inserted
 time_end = load_data(bucket, org, token, url, csv_dir, epoch)
 print('Last data inserted at time: '+str(time_end))
-print("Total number of line inserted:" + str(line_inserted_count))
+logging.info('Last data inserted at time: '+str(time_end))
+#print("Total number of line inserted:" + str(line_inserted_count))
+#logging.info("Total number of line inserted:" + str(line_inserted_count))
 
 end = time.time()
 
+elapsed_time = end - start
 print("Total time elapsed:")
-print(end - start)
+print(elapsed_time)
+logging.info("Total time elapsed:"+str(elapsed_time))
