@@ -26,8 +26,9 @@ def read_conf(conf_file):
     my_token = config['influxdb.parameters']['token']
     # Store the URL of your InfluxDB instance
     my_url = config['influxdb.parameters']['url']
+    secs_interval = config['influxdb.parameters']['secs_interval']
 
-    return my_bucket, my_org, my_token, my_url
+    return my_bucket, my_org, my_token, my_url, secs_interval
 
 
 def write_db(my_bucket, my_org, my_token, my_url, data):
@@ -54,8 +55,6 @@ def write_db(my_bucket, my_org, my_token, my_url, data):
     return
 
 
-
-
 def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch):
     #data = pd.read_csv(csv_file, sep=' |,') #delimiter=',')
     data = pd.read_csv(csv_file, sep=',')  # delimiter=',')
@@ -63,7 +62,6 @@ def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch
     for t in data.itertuples():
         value = t[11]
         # increasing timestamp by 90 secs
-        new_epoch = new_epoch + timedelta(seconds=10)
         # Fields cannot be added to Pandas tuples - need a conversion to list
         l = list(t)
         # adding timestamp to the first list element
@@ -75,7 +73,7 @@ def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch
     return new_epoch
 
 
-def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch):
+def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch, secs_interval):
     data = pd.read_csv(csv_file, sep=',')
     # take the first 250 values
     first_column = data.iloc[:,0]
@@ -83,11 +81,11 @@ def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch
     row_index = 0
     for t in first_column:
         # increasing timestamp by x secs
+        new_epoch = new_epoch + timedelta(seconds=int(secs_interval))
         new_epoch = new_epoch + timedelta(seconds=1)
         first_column.iat[row_index] = new_epoch
         row_index = row_index + 1
     result = pd.concat([first_column, second_n_column], axis=1)
-    #print(result)
     write_db_bulk(bucket, org, token, url, result)
     return new_epoch
 
@@ -111,8 +109,9 @@ def write_db_bulk(my_bucket, my_org, my_token, my_url, data):
     return
 
 
-def load_data(bucket, org, token, url, csv_dir, epoch):
+def load_data(bucket, org, token, url, csv_dir, epoch, secs_interval):
     currentTime = datetime.utcnow()
+    print(currentTime)
     while epoch < currentTime:
         print(epoch)
         dir = 0
@@ -121,9 +120,8 @@ def load_data(bucket, org, token, url, csv_dir, epoch):
             count = len(fnmatch.filter(os.listdir(csv_dir + str(dir)), '*.*'))
             while file < count:
                 csv_filename = csv_dir + str(dir) + '/' + str(file) + ".csv"
-                #print(csv_filename)
                 #epoch = write_csv_data_to_db_few_values(csv_filename, bucket, org, token, url, epoch)
-                epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch)
+                epoch = write_csv_data_to_db_250_values(csv_filename, bucket, org, token, url, epoch, secs_interval)
                 file = file + 1
             dir = dir + 1
     return epoch
@@ -143,14 +141,14 @@ start = time.time()
 line_inserted_count = 0
 epoch = datetime.utcnow() - timedelta(days=30)
 
-bucket, org, token, url = read_conf('conf_file.conf')
+bucket, org, token, url, secs_interval = read_conf('conf_file.conf')
 csv_dir = '../CSV_machine_data/'
 
 # get the fields to use for the points
 fields_name = get_fields_name("../CSV_machine_data/0/1.csv")
 
 # load the CSVs and get the last recorded time inserted
-time_end = load_data(bucket, org, token, url, csv_dir, epoch)
+time_end = load_data(bucket, org, token, url, csv_dir, epoch, secs_interval)
 print('Last data inserted at time: '+str(time_end))
 logging.info('Last data inserted at time: '+str(time_end))
 #print("Total number of line inserted:" + str(line_inserted_count))
