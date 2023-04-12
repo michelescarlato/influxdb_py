@@ -167,4 +167,5 @@ end = time.time()
 elapsed_time = end - start
 print("Total time elapsed:")
 print(elapsed_time)
-logging.info("Total time elapsed:"+str(elapsed_time))
+logging.info("Total time elapsed: "+str(elapsed_time))
+logging.info("Seconds interval: "+str(secs_interval))
