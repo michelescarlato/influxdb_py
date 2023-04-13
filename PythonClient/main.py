@@ -141,7 +141,11 @@ def get_fields_name(csv_path):
     print(fields_name_250)
     return fields_name_250
 
-logging.basicConfig(filename="logs/"+str(datetime.utcnow())+"_run.log", level=logging.INFO)
+log_name = str(datetime.now())
+log_name = log_name.replace(" ","_")
+print(log_name)
+logging.basicConfig(filename="logs/"+str(log_name)+"_run.log", level=logging.INFO)
+
 
 # start script temporizer
 start = time.time()
