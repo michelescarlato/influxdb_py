@@ -1,0 +1,3 @@
+INFO:root:Total time elapsed: 41.91259789466858
+INFO:root:Query used: from(bucket: "org_bucket_11")|> range(start: -30d)|> filter(fn: (r) => r["_measurement"] == "h3o_feet")|> filter(fn: (r) => r["_field"] == "m001s1_productivity")
+INFO:root:Result object: [<FluxTable: 8 columns, 211543 records>]

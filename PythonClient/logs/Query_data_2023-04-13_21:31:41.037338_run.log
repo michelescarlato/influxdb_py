@@ -1,0 +1,2 @@
+INFO:root:Total time elapsed: 8.043009757995605
+INFO:root:Query used: from(bucket: "org_bucket_11")|> range(start: -7d)|> filter(fn: (r) => r["_measurement"] == "h3o_feet")|> filter(fn: (r) => r["_field"] == "m001s1_productivity")
