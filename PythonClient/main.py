@@ -49,16 +49,16 @@ def write_db(my_bucket, my_org, my_token, my_url, data):
 
     write_api.write(bucket=my_bucket, org=org, record=p)
     print("Row: " + str(data[0])+ " time, " +str(data[1]) + " inserted ")
-    global line_inserted_count
-    line_inserted_count = line_inserted_count + 1
-    print (line_inserted_count)
+    global points_inserted_count
+    points_inserted_count = points_inserted_count + 1
+    print (points_inserted_count)
     return
 
 
 def write_csv_data_to_db_few_values(csv_file, bucket, org, token, url, new_epoch):
     #data = pd.read_csv(csv_file, sep=' |,') #delimiter=',')
     data = pd.read_csv(csv_file, sep=',')  # delimiter=',')
-    # line by line data    -->take 1,12 columns --> create time series gg, sec, a random value,
+    # points by points data    -->take 1,12 columns --> create time series gg, sec, a random value,
     for t in data.itertuples():
         value = t[11]
         # increasing timestamp by 90 secs
@@ -107,9 +107,9 @@ def write_db_bulk(my_bucket, my_org, my_token, my_url, data):
             _write_client.write(my_bucket, my_org, record=data, data_frame_measurement_name='h3o_feet',
                                 data_frame_tag_columns=['timems'])
 
-    global line_inserted_count
-    line_inserted_count = line_inserted_count + len(data.index)
-    print("after bulk write - points inserted so far:"+str(line_inserted_count))
+    global points_inserted_count
+    points_inserted_count = points_inserted_count + len(data.index)
+    print("after bulk write - points inserted so far:"+str(points_inserted_count))
     return
 
 
@@ -144,13 +144,13 @@ def get_fields_name(csv_path):
 log_name = str(datetime.now())
 log_name = log_name.replace(" ","_")
 print(log_name)
-logging.basicConfig(filename="logs/"+str(log_name)+"_run.log", level=logging.INFO)
+logging.basicConfig(filename="logs/Insert_data_"+str(log_name)+"_run.log", level=logging.INFO)
 
 
 # start script temporizer
 start = time.time()
 
-line_inserted_count = 0
+points_inserted_count = 0
 epoch = datetime.utcnow() - timedelta(days=30)
 
 bucket, org, token, url, secs_interval = read_conf('conf_file.conf')
@@ -163,8 +163,8 @@ fields_name = get_fields_name("../CSV_machine_data/0/1.csv")
 time_end = load_data(bucket, org, token, url, csv_dir, epoch, secs_interval)
 print('Last data inserted at time: '+str(time_end))
 logging.info('Last data inserted at time: '+str(time_end))
-print("Total number of line inserted:" + str(line_inserted_count))
-logging.info("Total number of line inserted:" + str(line_inserted_count))
+print("Total number of points inserted:" + str(points_inserted_count))
+logging.info("Total number of points inserted:" + str(points_inserted_count))
 
 end = time.time()
 
@@ -173,4 +173,4 @@ print("Total time elapsed:")
 print(elapsed_time)
 logging.info("Total time elapsed: "+str(elapsed_time))
 logging.info("Seconds interval: "+str(secs_interval))
-logging.info("Bucker used: "+str(bucket))
+logging.info("Bucket used: "+str(bucket))
