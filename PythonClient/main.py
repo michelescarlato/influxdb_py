@@ -13,7 +13,7 @@ import fnmatch
 from datetime import datetime
 from datetime import timedelta
 import time
-
+import socket
 
 
 def read_conf(conf_file):
@@ -144,6 +144,9 @@ log_name = str(datetime.now())
 log_name = log_name.replace(" ","_")
 print(log_name)
 logging.basicConfig(filename="logs/Insert_data_"+str(log_name)+"_run.log", level=logging.INFO)
+
+print(socket.gethostname())
+logging.info("Result object: "+str(socket.gethostname()))
 
 
 # start script temporizer

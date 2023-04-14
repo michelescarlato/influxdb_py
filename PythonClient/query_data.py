@@ -4,6 +4,8 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import configparser
 from datetime import datetime
 import time
+import socket
+
 def read_conf(conf_file):
     config = configparser.ConfigParser()
     # config.read('conf_file.conf')
@@ -26,6 +28,9 @@ log_name = log_name.replace(" ","_")
 print(log_name)
 logging.basicConfig(filename="logs/Query_data_"+str(log_name)+"_run.log", level=logging.INFO)
 
+print(socket.gethostname())
+logging.info("Result object: "+str(socket.gethostname()))
+
 client = influxdb_client.InfluxDBClient(
     url=url,
     token=token,
@@ -36,14 +41,16 @@ client = influxdb_client.InfluxDBClient(
 # Query script
 query_api = client.query_api()
 
-query_1_sensor = 'from(bucket: "org_bucket_11")\
+query_1_sensor = 'from(bucket: "org_bucket_1")\
 |> range(start: -30d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
 |> filter(fn: (r) => r["_field"] == "m001s1_productivity")'
 
-query_all_249_sensors = 'from(bucket: "org_bucket_11")\
-|> range(start: -4d)\
+query_all_249_sensors = 'from(bucket: "org_bucket_1")\
+|> range(start: -14d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")'
+
+print('Performing query:' + query_all_249_sensors)
 
 result = query_api.query(org=org, query=query_all_249_sensors)
 results = []
