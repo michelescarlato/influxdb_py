@@ -97,8 +97,7 @@ def write_db_bulk(my_bucket, my_org, my_token, my_url, data):
                                                           jitter_interval=2_000,
                                                           retry_interval=5_000,
                                                           max_retries=5,
-                                                          max_retry_delay=30_000,
-                                                          max_close_wait=300_000,
+                                                          max_retry_delay=30_000,#max_close_wait=300_000,
                                                           exponential_base=2)) as _write_client:
             """
             Write Pandas DataFrame
