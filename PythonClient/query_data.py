@@ -36,12 +36,16 @@ client = influxdb_client.InfluxDBClient(
 # Query script
 query_api = client.query_api()
 
-query = 'from(bucket: "org_bucket_11")\
+query_1_sensor = 'from(bucket: "org_bucket_11")\
 |> range(start: -30d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
 |> filter(fn: (r) => r["_field"] == "m001s1_productivity")'
 
-result = query_api.query(org=org, query=query)
+query_all_249_sensors = 'from(bucket: "org_bucket_11")\
+|> range(start: -4d)\
+|> filter(fn: (r) => r["_measurement"] == "h3o_feet")'
+
+result = query_api.query(org=org, query=query_all_249_sensors)
 results = []
 
 for table in result:
@@ -57,5 +61,5 @@ elapsed_time = end - start
 print("Total time elapsed:")
 print(elapsed_time)
 logging.info("Total time elapsed: "+str(elapsed_time))
-logging.info("Query used: "+str(query))
+logging.info("Query used: "+str(query_all_249_sensors))
 logging.info("Result object: "+str(result))
