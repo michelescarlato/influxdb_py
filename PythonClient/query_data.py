@@ -28,11 +28,12 @@ bucket, org, token, url, secs_interval = read_conf(file_name)
 start = time.time()
 log_name = str(datetime.now())
 log_name = log_name.replace(" ","_")
+hostname = str(socket.gethostname())
 print(log_name)
-logging.basicConfig(filename="logs/Query_data_"+str(log_name)+"_run.log", level=logging.INFO)
+logging.basicConfig(filename="logs/Query_data_"+hostname+"_"+str(log_name)+"_run.log", level=logging.INFO)
 
-print(socket.gethostname())
-logging.info("Result object: "+str(socket.gethostname()))
+print(hostname)
+logging.info("Result object: "+hostname)
 
 client = influxdb_client.InfluxDBClient(
     url=url,
