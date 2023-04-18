@@ -78,6 +78,7 @@ def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch
     # take the first 250 values
     first_column = data.iloc[:,0]
     second_n_column = data.iloc[:, 1:249].astype(float)
+    third_column = data.loc[:,'m001_abs_good']
     row_index = 0
     if new_epoch > currentTime:
         return new_epoch
@@ -86,7 +87,7 @@ def write_csv_data_to_db_250_values(csv_file, bucket, org, token, url, new_epoch
         new_epoch = new_epoch + timedelta(seconds=int(secs_interval))
         first_column.iat[row_index] = new_epoch
         row_index = row_index + 1
-    result = pd.concat([first_column, second_n_column], axis=1)
+    result = pd.concat([first_column, second_n_column,third_column], axis=1)
     write_db_bulk(bucket, org, token, url, result)
     return new_epoch
 
@@ -155,7 +156,7 @@ start = time.time()
 points_inserted_count = 0
 epoch = datetime.utcnow() - timedelta(days=30)
 
-bucket, org, token, url, secs_interval = read_conf('conf_file.conf')
+bucket, org, token, url, secs_interval = read_conf('conf_file_thinkcentre32gb.conf')
 csv_dir = '../CSV_machine_data/'
 
 # get the fields to use for the points
