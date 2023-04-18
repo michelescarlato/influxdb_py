@@ -1,0 +1,4 @@
+INFO:root:Result object: thinkcentre32GB-43.localdomain
+INFO:root:Total time elapsed: 727.1522450447083
+INFO:root:Query used: from(bucket: "org_bucket_3")|> range(start: -30d)|> filter(fn: (r) => r["_measurement"] == "h3o_feet")|> filter(fn: (r) => r["_field"] == "m001_abs_good")
+INFO:root:Result object: [<FluxTable: 8 columns, 2583576 records>]
