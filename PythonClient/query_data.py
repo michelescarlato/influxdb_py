@@ -1,4 +1,5 @@
 import logging
+import sys
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 import configparser
@@ -20,8 +21,10 @@ def read_conf(conf_file):
 
     return my_bucket, my_org, my_token, my_url, secs_interval
 
+file_name = sys.argv[1]
 
-bucket, org, token, url, secs_interval = read_conf('conf_file.conf')
+bucket, org, token, url, secs_interval = read_conf(file_name)
+
 start = time.time()
 log_name = str(datetime.now())
 log_name = log_name.replace(" ","_")
@@ -41,18 +44,20 @@ client = influxdb_client.InfluxDBClient(
 # Query script
 query_api = client.query_api()
 
-query_1_sensor = 'from(bucket: "org_bucket_1")\
+query_1_sensor = 'from(bucket: "org_bucket_3")\
 |> range(start: -30d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
-|> filter(fn: (r) => r["_field"] == "m001s1_productivity")'
+|> filter(fn: (r) => r["_field"] == "m001_abs_good")'
 
 query_all_249_sensors = 'from(bucket: "org_bucket_1")\
-|> range(start: -14d)\
+|> range(start: -27d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")'
 
-print('Performing query:' + query_all_249_sensors)
+current_query = query_1_sensor
 
-result = query_api.query(org=org, query=query_all_249_sensors)
+print('Performing query:' + current_query)
+
+result = query_api.query(org=org, query=current_query)
 results = []
 
 for table in result:
@@ -68,5 +73,5 @@ elapsed_time = end - start
 print("Total time elapsed:")
 print(elapsed_time)
 logging.info("Total time elapsed: "+str(elapsed_time))
-logging.info("Query used: "+str(query_all_249_sensors))
+logging.info("Query used: "+str(current_query))
 logging.info("Result object: "+str(result))
