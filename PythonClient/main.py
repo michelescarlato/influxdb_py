@@ -149,14 +149,14 @@ logging.basicConfig(filename="logs/Insert_data_"+str(log_name)+"_run.log", level
 print(socket.gethostname())
 logging.info("Result object: "+str(socket.gethostname()))
 
-
+file_name = sys.argv[1]
 # start script temporizer
 start = time.time()
 
 points_inserted_count = 0
 epoch = datetime.utcnow() - timedelta(days=30)
 
-bucket, org, token, url, secs_interval = read_conf('conf_file_thinkcentre32gb.conf')
+bucket, org, token, url, secs_interval = read_conf(file_name)
 csv_dir = '../CSV_machine_data/'
 
 # get the fields to use for the points
