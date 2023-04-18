@@ -1,6 +1,6 @@
 # import InfluxDB_ConfigurationInstance
 import logging
-
+import sys
 import influxdb_client
 from influxdb_client import WritePrecision, InfluxDBClient, Point, WriteOptions
 from influxdb_client.client.write_api import SYNCHRONOUS#, BATCHING
@@ -18,7 +18,6 @@ import socket
 
 def read_conf(conf_file):
     config = configparser.ConfigParser()
-    # config.read('conf_file.conf')
     config.read(conf_file)
     config.sections()
     my_bucket = config['influxdb.parameters']['bucket']
