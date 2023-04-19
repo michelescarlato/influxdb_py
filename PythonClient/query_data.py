@@ -50,11 +50,16 @@ query_1_sensor = 'from(bucket: "org_bucket_3")\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
 |> filter(fn: (r) => r["_field"] == "m001_abs_good")'
 
+query_1_sensor_fixed_range = 'from(bucket: "org_bucket_3")\
+|> range(start: 2023-03-19T06:47:30.000Z, stop: 2023-04-18T07:47:13.000Z)\
+|> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
+|> filter(fn: (r) => r["_field"] == "m001_abs_good")'
+
 query_all_249_sensors = 'from(bucket: "org_bucket_1")\
 |> range(start: -27d)\
 |> filter(fn: (r) => r["_measurement"] == "h3o_feet")'
 
-current_query = query_1_sensor
+current_query = query_1_sensor_fixed_range
 
 print('Performing query:' + current_query)
 
