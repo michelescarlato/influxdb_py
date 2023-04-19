@@ -45,19 +45,22 @@ client = influxdb_client.InfluxDBClient(
 # Query script
 query_api = client.query_api()
 
-query_1_sensor = 'from(bucket: "org_bucket_3")\
+field_name = "m001_abs_good"
+measurement_name = "h3o_feet"
+
+query_1_sensor = f'from(bucket: "{bucket}")\
 |> range(start: -30d)\
-|> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
-|> filter(fn: (r) => r["_field"] == "m001_abs_good")'
+|> filter(fn: (r) => r["_measurement"] == "{measurement_name}")\
+|> filter(fn: (r) => r["_field"] == "{field_name}")'
 
-query_1_sensor_fixed_range = 'from(bucket: "org_bucket_3")\
+query_1_sensor_fixed_range = f'from(bucket: "{bucket}")\
 |> range(start: 2023-03-19T06:47:30.000Z, stop: 2023-04-18T07:47:13.000Z)\
-|> filter(fn: (r) => r["_measurement"] == "h3o_feet")\
-|> filter(fn: (r) => r["_field"] == "m001_abs_good")'
+|> filter(fn: (r) => r["_measurement"] == "{measurement_name}")\
+|> filter(fn: (r) => r["_field"] == "{field_name}")'
 
-query_all_249_sensors = 'from(bucket: "org_bucket_1")\
+query_all_249_sensors = f'from(bucket: "{bucket}")\
 |> range(start: -27d)\
-|> filter(fn: (r) => r["_measurement"] == "h3o_feet")'
+|> filter(fn: (r) => r["_measurement"] == "{measurement_name}")'
 
 current_query = query_1_sensor_fixed_range
 
