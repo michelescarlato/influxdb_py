@@ -6,7 +6,9 @@ import configparser
 from datetime import datetime
 import time
 import socket
+from mira_utils import read_conf,convert_seconds
 
+'''
 def convert(seconds):
     seconds = seconds % (24 * 3600)
     hour = seconds // 3600
@@ -14,7 +16,9 @@ def convert(seconds):
     minutes = seconds // 60
     seconds %= 60
     return "%d:%02d:%02d" % (hour, minutes, seconds)
+'''
 
+'''
 def read_conf(conf_file):
     config = configparser.ConfigParser()
     config.read(conf_file)
@@ -27,10 +31,11 @@ def read_conf(conf_file):
     secs_interval = config['influxdb.parameters']['secs_interval']
 
     return my_bucket, my_org, my_token, my_url, secs_interval
+'''
 
 file_name = sys.argv[1]
 
-bucket, org, token, url, secs_interval = read_conf(file_name)
+bucket, org, token, url, secs_interval = read_conf.read_conf(file_name)
 
 start = time.time()
 log_name = str(datetime.now())
@@ -86,7 +91,7 @@ print(result)
 end = time.time()
 
 elapsed_time = end - start
-minutes = convert(elapsed_time)
+minutes = convert_seconds.convert_seconds(elapsed_time)
 print("Total time elapsed:")
 print(minutes)
 logging.info("Total time elapsed (hh:mm:ss): "+str(minutes))
