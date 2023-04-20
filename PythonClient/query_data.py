@@ -1,37 +1,11 @@
 import logging
 import sys
 import influxdb_client
-from influxdb_client.client.write_api import SYNCHRONOUS
-import configparser
 from datetime import datetime
 import time
 import socket
 from mira_utils import read_conf,convert_seconds
 
-'''
-def convert(seconds):
-    seconds = seconds % (24 * 3600)
-    hour = seconds // 3600
-    seconds %= 3600
-    minutes = seconds // 60
-    seconds %= 60
-    return "%d:%02d:%02d" % (hour, minutes, seconds)
-'''
-
-'''
-def read_conf(conf_file):
-    config = configparser.ConfigParser()
-    config.read(conf_file)
-    config.sections()
-    my_bucket = config['influxdb.parameters']['bucket']
-    my_org = config['influxdb.parameters']['org']
-    my_token = config['influxdb.parameters']['token']
-    # Store the URL of your InfluxDB instance
-    my_url = config['influxdb.parameters']['url']
-    secs_interval = config['influxdb.parameters']['secs_interval']
-
-    return my_bucket, my_org, my_token, my_url, secs_interval
-'''
 
 file_name = sys.argv[1]
 
