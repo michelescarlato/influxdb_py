@@ -17,7 +17,6 @@ def convert(seconds):
 
 def read_conf(conf_file):
     config = configparser.ConfigParser()
-    # config.read('conf_file.conf')
     config.read(conf_file)
     config.sections()
     my_bucket = config['influxdb.parameters']['bucket']
@@ -92,4 +91,5 @@ print("Total time elapsed:")
 print(minutes)
 logging.info("Total time elapsed (hh:mm:ss): "+str(minutes))
 logging.info("Query used: "+str(current_query))
-logging.info("Result object: "+str(result))
+logging.info("Bucket used: "+str(bucket))
+#logging.info("Result object: "+str(result))
