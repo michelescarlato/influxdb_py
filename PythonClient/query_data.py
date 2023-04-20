@@ -11,7 +11,7 @@ file_name = sys.argv[1]
 
 bucket, org, token, url, secs_interval = read_conf.read_conf(file_name)
 
-start = time.time()
+
 log_name = str(datetime.now())
 log_name = log_name.replace(" ","_")
 hostname = str(socket.gethostname())
@@ -44,15 +44,21 @@ query_1_sensor_fixed_range = f'from(bucket: "{bucket}")\
 |> filter(fn: (r) => r["_measurement"] == "{measurement_name}")\
 |> filter(fn: (r) => r["_field"] == "{field_name}")'
 
+query_1_sensor_fixed_range_1_day = f'from(bucket: "{bucket}")\
+|> range(start: 2023-03-22T00:00:00.000Z, stop: 2023-03-23T00:00:00.000Z)\
+|> filter(fn: (r) => r["_measurement"] == "{measurement_name}")\
+|> filter(fn: (r) => r["_field"] == "{field_name}")'
+
 query_all_249_sensors = f'from(bucket: "{bucket}")\
 |> range(start: -27d)\
 |> filter(fn: (r) => r["_measurement"] == "{measurement_name}")'
 
-current_query = query_1_sensor_fixed_range
+current_query = query_1_sensor_fixed_range_1_day
 
 print('Performing query:' + current_query)
-
+start = time.time()
 result = query_api.query(org=org, query=current_query)
+end = time.time()
 results = []
 
 for table in result:
@@ -62,7 +68,7 @@ for table in result:
 print(results)
 print(result)
 
-end = time.time()
+
 
 elapsed_time = end - start
 minutes = convert_seconds.convert_seconds(elapsed_time)
