@@ -7,6 +7,14 @@ from datetime import datetime
 import time
 import socket
 
+def convert(seconds):
+    seconds = seconds % (24 * 3600)
+    hour = seconds // 3600
+    seconds %= 3600
+    minutes = seconds // 60
+    seconds %= 60
+    return "%d:%02d:%02d" % (hour, minutes, seconds)
+
 def read_conf(conf_file):
     config = configparser.ConfigParser()
     # config.read('conf_file.conf')
@@ -79,8 +87,9 @@ print(result)
 end = time.time()
 
 elapsed_time = end - start
+minutes = convert(elapsed_time)
 print("Total time elapsed:")
-print(elapsed_time)
-logging.info("Total time elapsed: "+str(elapsed_time))
+print(minutes)
+logging.info("Total time elapsed (hh:mm:ss): "+str(minutes))
 logging.info("Query used: "+str(current_query))
 logging.info("Result object: "+str(result))
